@@ -1,3 +1,3 @@
 FROM rust:slim
-COPY ./target/release/account-info-integration ./target/release/account-info-integration
-ENTRYPOINT ["./target/release/account-info-integration"]
+COPY ./target/release/trading-settings-integration ./target/release/trading-settings-integration
+ENTRYPOINT ["./target/release/trading-settings-integration"]
