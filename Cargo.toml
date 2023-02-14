@@ -1,5 +1,5 @@
 [package]
-name = "account-info-integration"
+name = "trading-settings-integration"
 version = "0.1.0"
 edition = "2021"
 
