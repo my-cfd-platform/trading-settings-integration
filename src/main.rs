@@ -1,7 +1,7 @@
 use std::time::Duration;
 
-use account_info_integration::start_grpc_server;
 use tokio::time::sleep;
+use trading_settings_integration::start_grpc_server;
 
 #[tokio::main]
 async fn main() {
