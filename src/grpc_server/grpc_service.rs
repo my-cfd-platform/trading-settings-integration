@@ -1,5 +1,8 @@
 use std::pin::Pin;
 
+use my_nosql_contracts::{
+    TradingGroupNoSqlEntity, TradingInstrumentNoSqlEntity, TradingProfileNoSqlEntity,
+};
 use rust_extensions::date_time::DateTimeAsMicroseconds;
 
 use crate::{
@@ -46,21 +49,55 @@ impl TradingSettingsIntegrationGrpcService for GrpcService {
         &self,
         _: tonic::Request<()>,
     ) -> Result<tonic::Response<Self::GetTradingInstumentsStream>, tonic::Status> {
-        return my_grpc_extensions::grpc_server::send_vec_to_stream(vec![], |itm| itm).await;
+        let instruments = self
+            .app
+            .instruments_ns_reader
+            .get_by_partition_key_as_vec(TradingInstrumentNoSqlEntity::generate_partition_key())
+            .await;
+
+        let instruments = match instruments {
+            Some(instruments) => instruments
+                .iter()
+                .map(|x| x.as_ref().to_owned().into())
+                .collect(),
+            None => vec![],
+        };
+        return my_grpc_extensions::grpc_server::send_vec_to_stream(instruments, |itm| itm).await;
     }
 
     async fn get_trading_profiles(
         &self,
         _: tonic::Request<()>,
     ) -> Result<tonic::Response<Self::GetTradingProfilesStream>, tonic::Status> {
-        return my_grpc_extensions::grpc_server::send_vec_to_stream(vec![], |itm| itm).await;
+        let tps = self
+            .app
+            .trading_profiles_ns_reader
+            .get_by_partition_key_as_vec(TradingProfileNoSqlEntity::generate_partition_key())
+            .await;
+
+        let tps = match tps {
+            Some(tps) => tps.iter().map(|x| x.as_ref().to_owned().into()).collect(),
+            None => vec![],
+        };
+
+        return my_grpc_extensions::grpc_server::send_vec_to_stream(tps, |itm| itm).await;
     }
 
     async fn get_trading_groups(
         &self,
         _: tonic::Request<()>,
     ) -> Result<tonic::Response<Self::GetTradingGroupsStream>, tonic::Status> {
-        return my_grpc_extensions::grpc_server::send_vec_to_stream(vec![], |itm| itm).await;
+        let tgs = self
+            .app
+            .trading_groups_ns_reader
+            .get_by_partition_key_as_vec(TradingGroupNoSqlEntity::generate_partition_key())
+            .await;
+
+        let tgs = match tgs {
+            Some(tgs) => tgs.iter().map(|x| x.as_ref().to_owned().into()).collect(),
+            None => vec![],
+        };
+        return my_grpc_extensions::grpc_server::send_vec_to_stream(tgs, |itm| itm).await;
     }
 
     async fn ping(
@@ -68,7 +105,7 @@ impl TradingSettingsIntegrationGrpcService for GrpcService {
         _: tonic::Request<()>,
     ) -> Result<tonic::Response<PingResponse>, tonic::Status> {
         return Ok(tonic::Response::new(PingResponse {
-            service_name: "TRADING_SETTIGNS_INTEGRATION".to_string(),
+            service_name: "TRADING_SETTINGS_INTEGRATION".to_string(),
             date_time: DateTimeAsMicroseconds::now().unix_microseconds as u64,
         }));
     }
