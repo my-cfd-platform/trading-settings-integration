@@ -4,7 +4,7 @@ use my_nosql_contracts::{
 };
 
 use crate::trading_settings_integration_grpc::{
-    TradingGroupGrpcModel, TradingInstrumentGrpcModel, TradingInstumentDayOffGrpcModel,
+    TradingGroupGrpcModel, TradingInstrumentGrpcModel, TradingInstrumentDayOffGrpcModel,
     TradingProfileGrpcModel, TradingProfileInstrumentGrpcModel,
 };
 
@@ -27,9 +27,9 @@ impl Into<TradingInstrumentGrpcModel> for TradingInstrumentNoSqlEntity {
     }
 }
 
-impl Into<TradingInstumentDayOffGrpcModel> for TradingInstrumentDayOff {
-    fn into(self) -> TradingInstumentDayOffGrpcModel {
-        TradingInstumentDayOffGrpcModel {
+impl Into<TradingInstrumentDayOffGrpcModel> for TradingInstrumentDayOff {
+    fn into(self) -> TradingInstrumentDayOffGrpcModel {
+        TradingInstrumentDayOffGrpcModel {
             day_from: self.dow_from as u32,
             time_from: self.time_from,
             day_to: self.dow_to as u32,
@@ -55,6 +55,12 @@ impl Into<TradingProfileGrpcModel> for TradingProfileNoSqlEntity {
 
 impl Into<TradingProfileInstrumentGrpcModel> for TradingProfileInstrument {
     fn into(self) -> TradingProfileInstrumentGrpcModel {
+
+        let so = match self.stop_out_percent{
+            Some(src) => src,
+            None => 0.0,
+        };
+
         TradingProfileInstrumentGrpcModel {
             id: self.id,
             min_operation_volume: self.min_operation_volume as u64,
@@ -67,7 +73,7 @@ impl Into<TradingProfileInstrumentGrpcModel> for TradingProfileInstrument {
             is_trending: false,
             open_position_slippage: false,
             leverages: self.leverages.iter().map(|x| *x as u32).collect(),
-            stop_out_percent: self.stop_out_percent.unwrap(),
+            stop_out_percent: so,
         }
     }
 }

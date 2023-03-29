@@ -15,7 +15,7 @@ use crate::{
 
 #[tonic::async_trait]
 impl TradingSettingsIntegrationGrpcService for GrpcService {
-    type GetTradingInstumentsStream = Pin<
+    type GetTradingInstrumentsStream = Pin<
         Box<
             dyn tonic::codegen::futures_core::Stream<
                     Item = Result<TradingInstrumentGrpcModel, tonic::Status>,
@@ -45,10 +45,10 @@ impl TradingSettingsIntegrationGrpcService for GrpcService {
         >,
     >;
 
-    async fn get_trading_instuments(
+    async fn get_trading_instruments(
         &self,
         _: tonic::Request<()>,
-    ) -> Result<tonic::Response<Self::GetTradingInstumentsStream>, tonic::Status> {
+    ) -> Result<tonic::Response<Self::GetTradingInstrumentsStream>, tonic::Status> {
         let instruments = self
             .app
             .instruments_ns_reader
